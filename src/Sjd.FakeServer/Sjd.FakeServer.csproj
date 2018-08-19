@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
