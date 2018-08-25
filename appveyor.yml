@@ -9,10 +9,10 @@ init:
 before_build:
 - appveyor-retry dotnet restore -v Minimal
 build_script:
-- dotnet build "src\Sjd.FakeServer" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "test\FakeServer.Tests" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "src/Sjd.FakeServer" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "test/Sjd.FakeServer.Tests" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 after_build:
-- dotnet pack "src\Sjd.FakeServer" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet pack "src/Sjd.FakeServer" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 test_script:
 - dotnet test "test/Sjd.FakeServer.Tests" -c %CONFIGURATION%
 artifacts:
