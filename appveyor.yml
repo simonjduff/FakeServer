@@ -7,7 +7,7 @@ platform: Any CPU
 init:
 - ps: $Env:LABEL = "CI" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 before_build:
-- appveyor-retry dotnet restore src -v Minimal
+- appveyor-retry dotnet restore -v Minimal
 build_script:
 - dotnet build "src\Sjd.FakeServer" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 - dotnet build "test\FakeServer.Tests" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
