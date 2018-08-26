@@ -2,6 +2,13 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
+    <Version>1.0.0</Version>
+    <Authors>Simon J Duff</Authors>
+    <Company>Simon J Duff Ltd</Company>
+    <Description>A fake http provider wrapped in an http client for injection during testing</Description>
+    <PackageProjectUrl>https://github.com/simonjduff/fakeserver</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/simonjduff/fakeserver</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/simonjduff/FakeServer/blob/master/LICENCE.md</PackageLicenseUrl>
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
