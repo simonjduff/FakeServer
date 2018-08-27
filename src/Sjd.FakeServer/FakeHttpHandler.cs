@@ -18,7 +18,10 @@ namespace Sjd.FakeServer
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var match = FakeServer.Registrations[_id]
-                .FirstOrDefault(reg => reg.Uri.Equals(request.RequestUri));
+                .FirstOrDefault(reg => 
+                    reg.Uri.Equals(request.RequestUri)
+                    && reg.Method == request.Method
+                    );
             var message = new HttpResponseMessage
             {
                 Content = new StringContent(match.Response)

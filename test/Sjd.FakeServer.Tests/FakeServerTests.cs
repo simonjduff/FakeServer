@@ -35,6 +35,19 @@ namespace Sjd.FakeServer.Tests
                 .ExecuteAsync();
         }
 
+        [Fact]
+        public async Task PostUriRegistered()
+        {
+            string json = "{\"Test:\"Success\"}";
+                
+            await CTest<FakeServerContext>
+                .Given(i => i.RegisterAUri("http://fake.local/123", "{}"))
+                .And(i => i.RegisterAUri("http://fake.local/123", json, HttpMethod.Post))
+                .WhenAsync(i => i.MakeTheRequest("http://fake.local/123", HttpMethod.Post))
+                .ThenAsync(t => t.JsonIsReturned(json))
+                .ExecuteAsync();
+        }
+
         private class FakeServerContext : IHasServer,
             IHasResponse
         {
