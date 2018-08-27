@@ -23,11 +23,14 @@ namespace Sjd.FakeServer.Tests.Steps
             });
         }
 
-        public static async Task MakeTheRequest<T>(this IWhen<T> when, string uri)
+        public static async Task MakeTheRequest<T>(this IWhen<T> when, string uri, HttpMethod method = null)
             where T : IHasServer, IHasResponse
         {
             var client = when.Context.FakeServer.GetClient();
-            when.Context.ResponseMessage = await client.GetAsync(new Uri(uri));
+
+            var message = new HttpRequestMessage(method ?? HttpMethod.Get, new Uri(uri));
+
+            when.Context.ResponseMessage = await client.SendAsync(message);
         }
 
         public static async Task JsonIsReturned<T>(this IThen<T> then, string response)

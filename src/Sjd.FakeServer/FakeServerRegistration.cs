@@ -7,6 +7,12 @@ namespace Sjd.FakeServer
     {
         public Uri Uri { get; set; }
         public string Response { get; set; }
-        public HttpMethod Method { get; set; }
+        private HttpMethod _httpMethod = null;
+
+        public HttpMethod Method
+        {
+            get => _httpMethod ?? HttpMethod.Get;
+            set => _httpMethod = value;
+        }
     }
 }

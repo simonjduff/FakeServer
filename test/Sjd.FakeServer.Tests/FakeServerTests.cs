@@ -41,9 +41,9 @@ namespace Sjd.FakeServer.Tests
             string json = "{\"Test:\"Success\"}";
                 
             await CTest<FakeServerContext>
-                .Given(i => i.RegisterAUri("http://fake.local/123", json, HttpMethod.Post))
-                .And(i => i.RegisterAUri("http://fake.local/123", "{}"))
-                .WhenAsync(i => i.MakeTheRequest("http://fake.local/123"))
+                .Given(i => i.RegisterAUri("http://fake.local/123", "{}"))
+                .And(i => i.RegisterAUri("http://fake.local/123", json, HttpMethod.Post))
+                .WhenAsync(i => i.MakeTheRequest("http://fake.local/123", HttpMethod.Post))
                 .ThenAsync(t => t.JsonIsReturned(json))
                 .ExecuteAsync();
         }
