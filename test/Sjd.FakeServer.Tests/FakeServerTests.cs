@@ -16,9 +16,27 @@ namespace Sjd.FakeServer.Tests
             string json = "{\"Test:\"Success\"}";
             
             await CTest<FakeServerContext>
-                .Given(i => i.RegisterAUri("http://fake.local/123", json))
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(json)))
                 .WhenAsync(i => i.MakeTheRequest("http://fake.local/123"))
                 .ThenAsync(t => t.JsonIsReturned(json))
+                .ExecuteAsync();
+        }
+
+        [Fact]
+        public async Task ResponseHeaders()
+        {
+            string json = "{\"Test:\"Success\"}";
+
+            await CTest<FakeServerContext>
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(json)
+                    .WithResponseHeader("Header1", "Value1")
+                    .WithResponseHeader("Header1", "Value2")))
+                .WhenAsync(i => i.MakeTheRequest("http://fake.local/123"))
+                .ThenAsync(t => t.JsonIsReturned(json))
+                .And(t => t.ResponseHeader("Header1", "Value1"))
+                .And(t => t.ResponseHeader("Header1", "Value2"))
                 .ExecuteAsync();
         }
         
@@ -28,8 +46,10 @@ namespace Sjd.FakeServer.Tests
             string json = "{\"Test:\"Success\"}";
                 
             await CTest<FakeServerContext>
-                .Given(i => i.RegisterAUri("http://fake.local/123", json))
-                .And(i => i.RegisterAUri("http://fake.local/456", "{}"))
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(json)))
+                .And(i => i.RegisterAUri(b => b.WithUri("http://fake.local/456")
+                    .WithResponse("{}")))
                 .WhenAsync(i => i.MakeTheRequest("http://fake.local/123"))
                 .ThenAsync(t => t.JsonIsReturned(json))
                 .ExecuteAsync();
@@ -41,8 +61,11 @@ namespace Sjd.FakeServer.Tests
             string json = "{\"Test:\"Success\"}";
                 
             await CTest<FakeServerContext>
-                .Given(i => i.RegisterAUri("http://fake.local/123", "{}"))
-                .And(i => i.RegisterAUri("http://fake.local/123", json, HttpMethod.Post))
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse("{}")))
+                .And(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(json)
+                    .WithMethod(HttpMethod.Post)))
                 .WhenAsync(i => i.MakeTheRequest("http://fake.local/123", HttpMethod.Post))
                 .ThenAsync(t => t.JsonIsReturned(json))
                 .ExecuteAsync();

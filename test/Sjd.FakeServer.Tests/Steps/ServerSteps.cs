@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CheetahTesting;
@@ -10,17 +11,12 @@ namespace Sjd.FakeServer.Tests.Steps
     public static class ServerSteps
     {
         public static void RegisterAUri<T>(this IGiven<T> given, 
-            string uri, 
-            string response,
-            HttpMethod method = null)
+            Func<RegistrationBuilder, RegistrationBuilder> builder)
             where T : IHasServer
         {
-            given.Context.FakeServer.Register(new FakeServerRegistration
-            {
-                Uri = new Uri(uri),
-                Method = method ?? HttpMethod.Get,
-                Response = response
-            });
+            given.Context.FakeServer.Register(
+                builder(RegistrationBuilder.Register())
+                .Build());
         }
 
         public static async Task MakeTheRequest<T>(this IWhen<T> when, string uri, HttpMethod method = null)
@@ -38,6 +34,13 @@ namespace Sjd.FakeServer.Tests.Steps
         {
             var content = await then.Context.ResponseMessage.Content.ReadAsStringAsync();
             Assert.Equal(response, content);
+        }
+
+        public static void ResponseHeader<T>(this IThen<T> then, string header, string value)
+        where T : IHasResponse
+        {
+            Assert.True(then.Context.ResponseMessage.Headers.Contains(header));
+            Assert.Contains(value, then.Context.ResponseMessage.Headers.GetValues(header));
         }
     }
 }
