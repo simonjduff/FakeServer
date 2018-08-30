@@ -42,5 +42,11 @@ namespace Sjd.FakeServer.Tests.Steps
             Assert.True(then.Context.ResponseMessage.Headers.Contains(header));
             Assert.Contains(value, then.Context.ResponseMessage.Headers.GetValues(header));
         }
+
+        public static void ContentTypeIs<T>(this IThen<T> then, string contentType)
+        where T : IHasResponse
+        {
+            Assert.Equal(contentType, then.Context.ResponseMessage.Content.Headers.ContentType.MediaType);
+        }
     }
 }

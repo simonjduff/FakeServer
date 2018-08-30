@@ -39,7 +39,22 @@ namespace Sjd.FakeServer.Tests
                 .And(t => t.ResponseHeader("Header1", "Value2"))
                 .ExecuteAsync();
         }
-        
+
+        [Fact]
+        public async Task ContentTypeHeader()
+        {
+            string json = "{\"Test:\"Success\"}";
+
+            await CTest<FakeServerContext>
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(json)
+                    .WithContentType("application/vnd.custom")))
+                .WhenAsync(i => i.MakeTheRequest("http://fake.local/123"))
+                .ThenAsync(t => t.JsonIsReturned(json))
+                .And(t => t.ContentTypeIs("application/vnd.custom"))
+                .ExecuteAsync();
+        }
+
         [Fact]
         public async Task TwoUrisRegistered()
         {

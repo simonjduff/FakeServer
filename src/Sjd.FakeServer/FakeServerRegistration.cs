@@ -17,6 +17,8 @@ namespace Sjd.FakeServer
             get => _httpMethod ?? HttpMethod.Get;
             set => _httpMethod = value;
         }
+
+        public string ContentType { get; set; }
     }
 
     public class RegistrationBuilder
@@ -30,6 +32,7 @@ namespace Sjd.FakeServer
         private HttpMethod _httpMethod;
         private readonly Dictionary<string,List<string>> _responseHeaders = new Dictionary<string, List<string>>();
         private string _response;
+        private string _contentType;
 
         public RegistrationBuilder WithUri(Uri uri)
         {
@@ -67,6 +70,12 @@ namespace Sjd.FakeServer
             return this;
         }
 
+        public RegistrationBuilder WithContentType(string contentType)
+        {
+            _contentType = contentType;
+            return this;
+        }
+
         public FakeServerRegistration Build()
         {
             return new FakeServerRegistration
@@ -74,7 +83,8 @@ namespace Sjd.FakeServer
                 Uri = _uri,
                 Method = _httpMethod,
                 Response = _response,
-                Headers = _responseHeaders
+                Headers = _responseHeaders,
+                ContentType = _contentType
             };
         }
     }

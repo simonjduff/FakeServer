@@ -33,6 +33,11 @@ namespace Sjd.FakeServer
                 message.Headers.Add(header.Key, header.Value);
             }
 
+            if (!string.IsNullOrWhiteSpace(match.ContentType))
+            {
+                message.Content.Headers.ContentType.MediaType = match.ContentType;
+            }
+
             return Task.FromResult(message);
         }
     }
