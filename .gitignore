@@ -4,3 +4,4 @@ obj/
 secrets.json
 .idea/
 .vs/
+*.ncrunchsolution.user
