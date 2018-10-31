@@ -19,6 +19,8 @@ namespace Sjd.FakeServer
         }
 
         public string ContentType { get; set; }
+        public HttpContent Body { get; set; }
+        public Func<string, bool> ContentMatchFunc { get; set; }
     }
 
     public class RegistrationBuilder
@@ -33,6 +35,8 @@ namespace Sjd.FakeServer
         private readonly Dictionary<string,List<string>> _responseHeaders = new Dictionary<string, List<string>>();
         private string _response;
         private string _contentType;
+        private HttpContent _body;
+        private Func<string, bool> _matchFunc = m => true;
 
         public RegistrationBuilder WithUri(Uri uri)
         {
@@ -76,6 +80,18 @@ namespace Sjd.FakeServer
             return this;
         }
 
+        public RegistrationBuilder WithBody(string body)
+        {
+            _body = new StringContent(body);    
+            return this;
+        }
+
+        public RegistrationBuilder WithContentMatch(Func<string, bool> matchFunc)
+        {
+            _matchFunc = matchFunc;
+            return this;
+        }
+
         public FakeServerRegistration Build()
         {
             return new FakeServerRegistration
@@ -84,7 +100,9 @@ namespace Sjd.FakeServer
                 Method = _httpMethod,
                 Response = _response,
                 Headers = _responseHeaders,
-                ContentType = _contentType
+                ContentType = _contentType,
+                Body = _body,
+                ContentMatchFunc = _matchFunc
             };
         }
     }
