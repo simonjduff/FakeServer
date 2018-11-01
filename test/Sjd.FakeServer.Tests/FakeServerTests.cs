@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using CheetahTesting;
 using Sjd.FakeServer.Tests.ContextInterfaces;
@@ -112,6 +114,31 @@ namespace Sjd.FakeServer.Tests
                     ))
                 .WhenAsync(i => i.MakeTheRequest("http://fake.local/123", HttpMethod.Post, body))
                 .ThenAsync(t => t.JsonIsReturned(json))
+                .ExecuteAsync();
+        }
+
+        [Fact]
+        public async Task PrereturnLambda()
+        {
+            string json = "{\"Test:\"Success\"}";
+
+            var stopwatch = new Stopwatch();
+
+            await CTest<FakeServerContext>
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(json)
+                    .WithMethod(HttpMethod.Get)
+                    .WithBeforeReturn(() => Thread.Sleep(1000))
+                ))
+                .WhenAsync(i =>
+                {
+                    stopwatch.Start();
+                    var value = i.MakeTheRequest("http://fake.local/123", HttpMethod.Get);
+                    stopwatch.Stop();
+                    return value;
+                })
+                .ThenAsync(t => t.JsonIsReturned(json))
+                .And(c => Assert.True(stopwatch.ElapsedMilliseconds > 1000))
                 .ExecuteAsync();
         }
 

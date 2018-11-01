@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -15,16 +14,14 @@ namespace Sjd.FakeServer.Tests.Steps
             Func<RegistrationBuilder, RegistrationBuilder> builder)
             where T : IHasServer
         {
-            given.Context.FakeServer.Register(
-                builder(RegistrationBuilder.Register())
-                .Build());
+            given.Context.FakeServer.Register(builder);
         }
 
         public static async Task MakeTheRequest<T>(this IWhen<T> when, 
             string uri, 
             HttpMethod method = null,
             string body = null)
-            where T : IHasServer, IHasResponse
+            where T : class, IHasServer, IHasResponse
         {
             var client = when.Context.FakeServer.GetClient();
 
