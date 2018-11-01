@@ -42,10 +42,12 @@ namespace Sjd.FakeServer
 
             match.PreReturnAction();
 
-            var message = new HttpResponseMessage(match.StatusCode)
+            var message = new HttpResponseMessage(match.StatusCode);
+
+            if (match.Response != null)
             {
-                Content = new StringContent(match.Response),
-            };
+                message.Content = new StringContent(match.Response);
+            }
 
             foreach (var header in match.Headers ?? new Dictionary<string, List<string>>())
             {

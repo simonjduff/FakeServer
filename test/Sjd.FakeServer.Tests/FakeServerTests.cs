@@ -82,6 +82,19 @@ namespace Sjd.FakeServer.Tests
         }
 
         [Fact]
+        public async Task NullBody()
+        {
+            await CTest<FakeServerContext>
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(null)
+                    .WithStatusCode(HttpStatusCode.Accepted)))
+                .WhenAsync(i => i.MakeTheRequest("http://fake.local/123"))
+                .ThenAsync(t => t.JsonIsReturned(null))
+                .And(t => t.StatusCodeIs(HttpStatusCode.Accepted))
+                .ExecuteAsync();
+        }
+
+        [Fact]
         public async Task TwoUrisRegistered()
         {
             string json = "{\"Test:\"Success\"}";

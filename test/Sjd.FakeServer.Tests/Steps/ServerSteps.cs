@@ -39,6 +39,13 @@ namespace Sjd.FakeServer.Tests.Steps
             where T : IHasResponse
         {
             Assert.NotEqual(HttpStatusCode.NotFound, then.Context.ResponseMessage.StatusCode);
+
+            if (response == null)
+            {
+                Assert.Null(then.Context.ResponseMessage.Content);
+                return;
+            }
+
             var content = await then.Context.ResponseMessage.Content.ReadAsStringAsync();
             Assert.Equal(response, content);
         }
