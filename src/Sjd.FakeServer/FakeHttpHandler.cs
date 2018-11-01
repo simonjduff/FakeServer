@@ -42,7 +42,7 @@ namespace Sjd.FakeServer
 
             match.PreReturnAction();
 
-            var message = new HttpResponseMessage
+            var message = new HttpResponseMessage(match.StatusCode)
             {
                 Content = new StringContent(match.Response),
             };

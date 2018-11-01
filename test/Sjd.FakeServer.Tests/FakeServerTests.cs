@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,6 +63,21 @@ namespace Sjd.FakeServer.Tests
                 .WhenAsync(i => i.MakeTheRequest("http://fake.local/123"))
                 .ThenAsync(t => t.JsonIsReturned(json))
                 .And(t => t.ContentTypeIs("application/vnd.custom"))
+                .ExecuteAsync();
+        }
+
+        [Fact]
+        public async Task StatusCode()
+        {
+            string json = "{\"Test:\"Success\"}";
+
+            await CTest<FakeServerContext>
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(json)
+                    .WithStatusCode(HttpStatusCode.Accepted)))
+                .WhenAsync(i => i.MakeTheRequest("http://fake.local/123"))
+                .ThenAsync(t => t.JsonIsReturned(json))
+                .And(t => t.StatusCodeIs(HttpStatusCode.Accepted))
                 .ExecuteAsync();
         }
 
