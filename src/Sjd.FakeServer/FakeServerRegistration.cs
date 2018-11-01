@@ -21,15 +21,11 @@ namespace Sjd.FakeServer
         public string ContentType { get; set; }
         public HttpContent Body { get; set; }
         public Func<string, bool> ContentMatchFunc { get; set; }
+        public Action PreReturnAction { get; set; }
     }
 
     public class RegistrationBuilder
     {
-        public static RegistrationBuilder Register()
-        {
-            return new RegistrationBuilder();
-        }
-
         private Uri _uri;
         private HttpMethod _httpMethod;
         private readonly Dictionary<string,List<string>> _responseHeaders = new Dictionary<string, List<string>>();
@@ -37,6 +33,7 @@ namespace Sjd.FakeServer
         private string _contentType;
         private HttpContent _body;
         private Func<string, bool> _matchFunc = m => true;
+        private Action _preReturnAction = () => { };
 
         public RegistrationBuilder WithUri(Uri uri)
         {
@@ -92,6 +89,12 @@ namespace Sjd.FakeServer
             return this;
         }
 
+        public RegistrationBuilder WithBeforeReturn(Action action)
+        {
+            _preReturnAction = action;
+            return this;
+        }
+
         public FakeServerRegistration Build()
         {
             return new FakeServerRegistration
@@ -102,7 +105,8 @@ namespace Sjd.FakeServer
                 Headers = _responseHeaders,
                 ContentType = _contentType,
                 Body = _body,
-                ContentMatchFunc = _matchFunc
+                ContentMatchFunc = _matchFunc,
+                PreReturnAction = _preReturnAction
             };
         }
     }

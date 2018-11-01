@@ -6,14 +6,23 @@ namespace Sjd.FakeServer
 {
     public class FakeServer
     {
-        private readonly Guid Id = Guid.NewGuid();
+        private readonly Guid _id = Guid.NewGuid();
 
         internal static readonly ConcurrentDictionary<Guid, FakeServerRegistration[]> Registrations =
             new ConcurrentDictionary<Guid, FakeServerRegistration[]>(); 
 
+        public void Register(Func<RegistrationBuilder,RegistrationBuilder> builderFunc)
+        {
+            var builder = new RegistrationBuilder();
+#pragma warning disable CS0618 // Type or member is obsolete
+            Register(builderFunc(builder).Build());
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        [Obsolete("Use Register(Func<RegistrationBuilder,RegistrationBuilder>)")]
         public void Register(FakeServerRegistration registration)
         {
-            Registrations.AddOrUpdate(Id,
+            Registrations.AddOrUpdate(_id,
                 new [] {registration},
                 (id, cur) =>
                 {
@@ -26,7 +35,7 @@ namespace Sjd.FakeServer
 
         public HttpClient GetClient()
         {
-            return new HttpClient(new FakeHttpHandler(Id));
+            return new HttpClient(new FakeHttpHandler(_id));
         }
     }
 }

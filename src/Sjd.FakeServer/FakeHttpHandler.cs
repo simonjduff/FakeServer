@@ -40,6 +40,8 @@ namespace Sjd.FakeServer
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
 
+            match.PreReturnAction();
+
             var message = new HttpResponseMessage
             {
                 Content = new StringContent(match.Response),
