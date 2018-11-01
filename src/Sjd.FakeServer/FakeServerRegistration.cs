@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 
 namespace Sjd.FakeServer
@@ -22,6 +23,7 @@ namespace Sjd.FakeServer
         public HttpContent Body { get; set; }
         public Func<string, bool> ContentMatchFunc { get; set; }
         public Action PreReturnAction { get; set; }
+        public HttpStatusCode StatusCode { get; set; }
     }
 
     public class RegistrationBuilder
@@ -34,6 +36,7 @@ namespace Sjd.FakeServer
         private HttpContent _body;
         private Func<string, bool> _matchFunc = m => true;
         private Action _preReturnAction = () => { };
+        private HttpStatusCode _statusCode = HttpStatusCode.OK;
 
         public RegistrationBuilder WithUri(Uri uri)
         {
@@ -95,6 +98,12 @@ namespace Sjd.FakeServer
             return this;
         }
 
+        public RegistrationBuilder WithStatusCode(HttpStatusCode statusCode)
+        {
+            _statusCode = statusCode;
+            return this;
+        }
+
         public FakeServerRegistration Build()
         {
             return new FakeServerRegistration
@@ -106,7 +115,8 @@ namespace Sjd.FakeServer
                 ContentType = _contentType,
                 Body = _body,
                 ContentMatchFunc = _matchFunc,
-                PreReturnAction = _preReturnAction
+                PreReturnAction = _preReturnAction,
+                StatusCode = _statusCode
             };
         }
     }

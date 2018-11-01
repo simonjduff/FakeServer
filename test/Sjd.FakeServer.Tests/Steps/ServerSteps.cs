@@ -55,5 +55,11 @@ namespace Sjd.FakeServer.Tests.Steps
         {
             Assert.Equal(contentType, then.Context.ResponseMessage.Content.Headers.ContentType.MediaType);
         }
+
+        public static void StatusCodeIs<T>(this IThen<T> then, HttpStatusCode statusCode)
+            where T : IHasResponse
+        {
+            Assert.Equal(statusCode, then.Context.ResponseMessage.StatusCode);
+        }
     }
 }

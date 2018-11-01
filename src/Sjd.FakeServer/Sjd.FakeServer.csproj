@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-    <Version>1.4.0</Version>
+    <Version>1.5.0</Version>
     <Authors>Simon J Duff</Authors>
     <Company>Simon J Duff Ltd</Company>
     <Description>A fake http provider wrapped in an http client for injection during testing</Description>
