@@ -5,11 +5,19 @@ using CheetahTesting;
 using Sjd.FakeServer.Tests.ContextInterfaces;
 using Sjd.FakeServer.Tests.Steps;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Sjd.FakeServer.Tests
 {
     public class FakeServerTests
     {
+        private readonly ITestOutputHelper _output;
+
+        public FakeServerTests(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [Fact]
         public async Task SimpleUri()
         {
@@ -82,6 +90,27 @@ namespace Sjd.FakeServer.Tests
                     .WithResponse(json)
                     .WithMethod(HttpMethod.Post)))
                 .WhenAsync(i => i.MakeTheRequest("http://fake.local/123", HttpMethod.Post))
+                .ThenAsync(t => t.JsonIsReturned(json))
+                .ExecuteAsync();
+        }
+
+        [Fact]
+        public async Task LambdaMatcher()
+        {
+            string json = "{\"Test:\"Success\"}";
+            string body = "{\"MatchMe:\"123\"}";
+
+            await CTest<FakeServerContext>
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse("{}")))
+                .And(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(json)
+                    .WithMethod(HttpMethod.Post)
+                    .WithBody(body)
+                    .WithContentMatch(content =>
+                        content?.Equals(body) ?? false)
+                    ))
+                .WhenAsync(i => i.MakeTheRequest("http://fake.local/123", HttpMethod.Post, body))
                 .ThenAsync(t => t.JsonIsReturned(json))
                 .ExecuteAsync();
         }

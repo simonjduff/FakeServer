@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CheetahTesting;
@@ -19,12 +20,20 @@ namespace Sjd.FakeServer.Tests.Steps
                 .Build());
         }
 
-        public static async Task MakeTheRequest<T>(this IWhen<T> when, string uri, HttpMethod method = null)
+        public static async Task MakeTheRequest<T>(this IWhen<T> when, 
+            string uri, 
+            HttpMethod method = null,
+            string body = null)
             where T : IHasServer, IHasResponse
         {
             var client = when.Context.FakeServer.GetClient();
 
             var message = new HttpRequestMessage(method ?? HttpMethod.Get, new Uri(uri));
+
+            if (!string.IsNullOrEmpty(body))
+            {
+                message.Content = new StringContent(body);
+            }
 
             when.Context.ResponseMessage = await client.SendAsync(message);
         }
@@ -32,6 +41,7 @@ namespace Sjd.FakeServer.Tests.Steps
         public static async Task JsonIsReturned<T>(this IThen<T> then, string response)
             where T : IHasResponse
         {
+            Assert.NotEqual(HttpStatusCode.NotFound, then.Context.ResponseMessage.StatusCode);
             var content = await then.Context.ResponseMessage.Content.ReadAsStringAsync();
             Assert.Equal(response, content);
         }
