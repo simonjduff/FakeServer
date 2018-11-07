@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sjd.FakeServer
 {
@@ -22,7 +24,7 @@ namespace Sjd.FakeServer
         public string ContentType { get; set; }
         public HttpContent Body { get; set; }
         public Func<string, bool> ContentMatchFunc { get; set; }
-        public Action PreReturnAction { get; set; }
+        public Func<CancellationToken, Task> PreReturnAction { get; set; }
         public HttpStatusCode StatusCode { get; set; }
     }
 
@@ -34,7 +36,7 @@ namespace Sjd.FakeServer
         private string _response;
         private string _contentType;
         private Func<string, bool> _matchFunc = m => true;
-        private Action _preReturnAction = () => { };
+        private Func<CancellationToken,Task> _preReturnAction = t => Task.CompletedTask;
         private HttpStatusCode _statusCode = HttpStatusCode.OK;
 
         public RegistrationBuilder WithUri(Uri uri)
@@ -91,9 +93,18 @@ namespace Sjd.FakeServer
             return this;
         }
 
-        public RegistrationBuilder WithBeforeReturn(Action action)
+        public RegistrationBuilder WithBeforeReturn(Func<CancellationToken, Task> action)
         {
             _preReturnAction = action;
+            return this;
+        }
+
+        public RegistrationBuilder WithBeforeReturn(Action action)
+        {
+            _preReturnAction = t => {
+                action.Invoke();
+                return Task.CompletedTask;
+            };
             return this;
         }
 
