@@ -18,12 +18,12 @@ namespace Sjd.FakeServer.Tests.Steps
         }
 
         public static async Task MakeTheRequest<T>(this IWhen<T> when, 
+            HttpClient client,
             string uri, 
             HttpMethod method = null,
             string body = null)
             where T : class, IHasServer, IHasResponse
         {
-            var client = when.Context.FakeServer.GetClient();
 
             var message = new HttpRequestMessage(method ?? HttpMethod.Get, new Uri(uri));
 
@@ -33,6 +33,17 @@ namespace Sjd.FakeServer.Tests.Steps
             }
 
             when.Context.ResponseMessage = await client.SendAsync(message);
+        }
+
+        public static async Task MakeTheRequest<T>(this IWhen<T> when,
+            string uri,
+            HttpMethod method = null,
+            string body = null)
+            where T : class, IHasServer, IHasResponse
+        {
+            var client = when.Context.FakeServer.GetClient();
+
+            await MakeTheRequest<T>(when, client, uri, method, body);
         }
 
         public static async Task JsonIsReturned<T>(this IThen<T> then, string response)

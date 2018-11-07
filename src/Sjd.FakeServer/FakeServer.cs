@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Net.Http;
+using System.Threading;
 
 namespace Sjd.FakeServer
 {
@@ -9,7 +10,7 @@ namespace Sjd.FakeServer
         private readonly Guid _id = Guid.NewGuid();
 
         internal static readonly ConcurrentDictionary<Guid, FakeServerRegistration[]> Registrations =
-            new ConcurrentDictionary<Guid, FakeServerRegistration[]>(); 
+            new ConcurrentDictionary<Guid, FakeServerRegistration[]>();
 
         public void Register(Func<RegistrationBuilder,RegistrationBuilder> builderFunc)
         {
@@ -33,9 +34,14 @@ namespace Sjd.FakeServer
                 });
         }
 
+        public HttpClient GetClient(TimeSpan timeout)
+        {
+            return new HttpClient(new FakeHttpHandler(_id, timeout));
+        }
+
         public HttpClient GetClient()
         {
-            return new HttpClient(new FakeHttpHandler(_id));
+            return new HttpClient(new FakeHttpHandler(_id, Timeout.InfiniteTimeSpan));
         }
     }
 }
