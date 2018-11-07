@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -82,6 +83,19 @@ namespace Sjd.FakeServer.Tests
         }
 
         [Fact]
+        public async Task NullBody()
+        {
+            await CTest<FakeServerContext>
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(null)
+                    .WithStatusCode(HttpStatusCode.Accepted)))
+                .WhenAsync(i => i.MakeTheRequest("http://fake.local/123"))
+                .ThenAsync(t => t.JsonIsReturned(null))
+                .And(t => t.StatusCodeIs(HttpStatusCode.Accepted))
+                .ExecuteAsync();
+        }
+
+        [Fact]
         public async Task TwoUrisRegistered()
         {
             string json = "{\"Test:\"Success\"}";
@@ -124,7 +138,6 @@ namespace Sjd.FakeServer.Tests
                 .And(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
                     .WithResponse(json)
                     .WithMethod(HttpMethod.Post)
-                    .WithBody(body)
                     .WithContentMatch(content =>
                         content?.Equals(body) ?? false)
                     ))
@@ -158,12 +171,49 @@ namespace Sjd.FakeServer.Tests
                 .ExecuteAsync();
         }
 
+        [Fact]
+        public async Task Timeout()
+        {
+            string json = "{\"Test:\"Success\"}";
+
+            var stopwatch = new Stopwatch();
+
+            await CTest<FakeServerContext>
+                .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
+                    .WithResponse(json)
+                    .WithMethod(HttpMethod.Get)
+                    .WithBeforeReturn(() => Thread.Sleep(1000))
+                ))
+                .WhenAsync(async i =>
+                {
+                    var client = i.Context.FakeServer.GetClient(TimeSpan.FromMilliseconds(100));
+                    client.Timeout = TimeSpan.FromMilliseconds(100);
+                    try
+                    {
+                        await i.MakeTheRequest(client, "http://fake.local/123", HttpMethod.Get);
+                    }
+                    catch (Exception e)
+                    {
+                        i.Context.Exception = e;
+                    }
+                })
+                .Then(t => Assert.True(t.Context.Exception is TaskCanceledException))
+                .ExecuteAsync();
+        }
+
         private class FakeServerContext : IHasServer,
-            IHasResponse
+            IHasResponse,
+            IHasException
         {
             public FakeServer FakeServer { get; set; } = new FakeServer();
             public List<FakeServerRegistration> Registrations { get; set; } = new List<FakeServerRegistration>();
             public HttpResponseMessage ResponseMessage { get; set; }
+            public Exception Exception { get; set; }
+        }
+
+        public interface IHasException
+        {
+            Exception Exception { get; set; }
         }
     }
 }
