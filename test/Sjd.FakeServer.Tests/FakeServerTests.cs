@@ -186,7 +186,7 @@ namespace Sjd.FakeServer.Tests
                 ))
                 .WhenAsync(async i =>
                 {
-                    var client = i.Context.FakeServer.GetClient(TimeSpan.FromMilliseconds(100));
+                    var client = i.Context.FakeServer.GetClient();
                     client.Timeout = TimeSpan.FromMilliseconds(100);
                     try
                     {

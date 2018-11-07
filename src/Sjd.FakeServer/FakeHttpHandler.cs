@@ -22,9 +22,6 @@ namespace Sjd.FakeServer
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, 
             CancellationToken cancellationToken)
         {
-            using (GetCancellation(cancellationToken))
-            {
-
                 var content = request?.Content != null
                     ? await request.Content?.ReadAsStringAsync()
                     : string.Empty;
@@ -46,10 +43,6 @@ namespace Sjd.FakeServer
                 }
 
                 match.PreReturnAction();
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    throw new TaskCanceledException();
-                }
 
                 var message = new HttpResponseMessage(match.StatusCode);
 
@@ -74,14 +67,6 @@ namespace Sjd.FakeServer
                 }
 
                 return message;
-            }
-        }
-
-        private CancellationTokenSource GetCancellation(CancellationToken cancellationToken)
-        {
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            cts.CancelAfter(_timeout);
-            return cts;
         }
     }
 }
