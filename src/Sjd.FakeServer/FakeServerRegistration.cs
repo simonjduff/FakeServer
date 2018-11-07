@@ -33,7 +33,6 @@ namespace Sjd.FakeServer
         private readonly Dictionary<string,List<string>> _responseHeaders = new Dictionary<string, List<string>>();
         private string _response;
         private string _contentType;
-        private HttpContent _body;
         private Func<string, bool> _matchFunc = m => true;
         private Action _preReturnAction = () => { };
         private HttpStatusCode _statusCode = HttpStatusCode.OK;
@@ -80,10 +79,10 @@ namespace Sjd.FakeServer
             return this;
         }
 
+        [Obsolete("Use WithResponse")]
         public RegistrationBuilder WithBody(string body)
         {
-            _body = new StringContent(body);    
-            return this;
+            return WithResponse(body);
         }
 
         public RegistrationBuilder WithContentMatch(Func<string, bool> matchFunc)
@@ -113,7 +112,6 @@ namespace Sjd.FakeServer
                 Response = _response,
                 Headers = _responseHeaders,
                 ContentType = _contentType,
-                Body = _body,
                 ContentMatchFunc = _matchFunc,
                 PreReturnAction = _preReturnAction,
                 StatusCode = _statusCode

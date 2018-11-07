@@ -137,7 +137,6 @@ namespace Sjd.FakeServer.Tests
                 .And(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
                     .WithResponse(json)
                     .WithMethod(HttpMethod.Post)
-                    .WithBody(body)
                     .WithContentMatch(content =>
                         content?.Equals(body) ?? false)
                     ))
