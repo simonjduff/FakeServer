@@ -42,29 +42,32 @@ namespace Sjd.FakeServer
                     return new HttpResponseMessage(HttpStatusCode.NotFound);
                 }
 
-                match.PreReturnAction();
+                HttpResponseMessage message = null;
+                await Task.Run(async () => {
+                    await match.PreReturnAction(cancellationToken);
 
-                var message = new HttpResponseMessage(match.StatusCode);
+                    message = new HttpResponseMessage(match.StatusCode);
 
-                if (match.Response != null)
-                {
-                    message.Content = new StringContent(match.Response);
-                }
+                    if (match.Response != null)
+                    {
+                        message.Content = new StringContent(match.Response);
+                    }
 
-                foreach (var header in match.Headers ?? new Dictionary<string, List<string>>())
-                {
-                    message.Headers.Add(header.Key, header.Value);
-                }
+                    foreach (var header in match.Headers ?? new Dictionary<string, List<string>>())
+                    {
+                        message.Headers.Add(header.Key, header.Value);
+                    }
 
-                if (!string.IsNullOrWhiteSpace(match.ContentType))
-                {
-                    message.Content.Headers.ContentType.MediaType = match.ContentType;
-                }
+                    if (!string.IsNullOrWhiteSpace(match.ContentType))
+                    {
+                        message.Content.Headers.ContentType.MediaType = match.ContentType;
+                    }
 
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    throw new TaskCanceledException();
-                }
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        throw new TaskCanceledException();
+                    }
+                }, cancellationToken);
 
                 return message;
         }

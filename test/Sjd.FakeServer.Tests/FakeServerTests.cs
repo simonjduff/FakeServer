@@ -159,12 +159,11 @@ namespace Sjd.FakeServer.Tests
                     .WithMethod(HttpMethod.Get)
                     .WithBeforeReturn(() => Thread.Sleep(1000))
                 ))
-                .WhenAsync(i =>
+                .WhenAsync(async i =>
                 {
                     stopwatch.Start();
-                    var value = i.MakeTheRequest("http://fake.local/123", HttpMethod.Get);
+                    await i.MakeTheRequest("http://fake.local/123", HttpMethod.Get);
                     stopwatch.Stop();
-                    return value;
                 })
                 .ThenAsync(t => t.JsonIsReturned(json))
                 .And(c => Assert.True(stopwatch.ElapsedMilliseconds > 1000))
@@ -177,12 +176,13 @@ namespace Sjd.FakeServer.Tests
             string json = "{\"Test:\"Success\"}";
 
             var stopwatch = new Stopwatch();
-
+var sw1 = new Stopwatch();
+sw1.Start();
             await CTest<FakeServerContext>
                 .Given(i => i.RegisterAUri(b => b.WithUri("http://fake.local/123")
                     .WithResponse(json)
                     .WithMethod(HttpMethod.Get)
-                    .WithBeforeReturn(() => Thread.Sleep(1000))
+                    .WithBeforeReturn(t => Task.Delay(5000, t))
                 ))
                 .WhenAsync(async i =>
                 {
@@ -190,7 +190,10 @@ namespace Sjd.FakeServer.Tests
                     client.Timeout = TimeSpan.FromMilliseconds(100);
                     try
                     {
+                        stopwatch.Start();
                         await i.MakeTheRequest(client, "http://fake.local/123", HttpMethod.Get);
+                        stopwatch.Stop();
+                        Assert.True(stopwatch.ElapsedMilliseconds < 500);
                     }
                     catch (Exception e)
                     {
