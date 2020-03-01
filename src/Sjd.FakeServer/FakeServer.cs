@@ -35,13 +35,15 @@ namespace Sjd.FakeServer
         }
 
         public HttpClient GetClient(TimeSpan timeout)
-        {
-            return new HttpClient(new FakeHttpHandler(_id, timeout));
-        }
+            => new HttpClient(new FakeHttpHandler(_id, timeout));
+
+        public DelegatingHandler GetDelegatingHandler(TimeSpan timeout)
+            => new FakeHttpHandler(_id, timeout);
+
+        public DelegatingHandler GetDelegatingHandler()
+            => new FakeHttpHandler(_id, Timeout.InfiniteTimeSpan);
 
         public HttpClient GetClient()
-        {
-            return new HttpClient(new FakeHttpHandler(_id, Timeout.InfiniteTimeSpan));
-        }
+            => new HttpClient(new FakeHttpHandler(_id, Timeout.InfiniteTimeSpan));
     }
 }
